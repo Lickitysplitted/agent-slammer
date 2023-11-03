@@ -6,6 +6,9 @@ from pathlib import Path
 from rich.progress import track
 from csv import DictWriter
 
+__author__ = 'Lickitysplitted'
+__version__ = '0.0.1'
+
 app = typer.Typer()
 logger = logging.getLogger(__name__)
 
@@ -29,17 +32,17 @@ def request(target: str, agent) -> dict:
             f'ERROR: {r.status_code}, {r.raise_for_status}, {r.text}'
             )
     else:
-        r_intel = {'agent': {agent},
-                   'url': {target},
-                   'status code': {str(r.status_code)},
-                   'request headers': {str(r.request.headers)},
-                   'response headers': {str(r.headers)},
-                   'cookies': {str(r.cookies)},
-                   'response text': {r.text}}
+        r_intel = {'agent': agent,
+                   'url': target,
+                   'status code': str(r.status_code),
+                   'request headers': str(r.request.headers),
+                   'response headers': str(r.headers),
+                   'cookies': str(r.cookies),
+                   'response text': r.text}
         #print(r_intel, type(r_intel))
         return r_intel
 
-def reporter(rpath: Path, rdata: list):
+def reporter(rpath: Path, rdata: list) -> dict:
     if rpath and rdata:
         with open(rpath.resolve(), 'a', encoding='utf-8') as robj:
             writer = DictWriter(robj, ['agent',
