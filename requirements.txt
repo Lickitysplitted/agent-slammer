@@ -1,2 +1,2 @@
-typer
-rich
+typer==0.9.0
+rich==13.6.0
