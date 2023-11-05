@@ -23,6 +23,8 @@ mobile = [{"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, 
 
 async def request(target: str, agents: List[dict]) -> List[dict]:
     if target and agents:
+        log = logging.getLogger('charset_normalizer')
+        log.setLevel(logging.WARNING)
         async with aiohttp.ClientSession() as session:
             reqlog = []
             for agent in track(agents, description="Hacking..."):
@@ -35,7 +37,7 @@ async def request(target: str, agents: List[dict]) -> List[dict]:
                                'cookies': str(req.cookies),
                                'response text': (await req.text())}
                     reqlog.append(reqdata)
-        return reqdata
+        return reqlog
     else:
         logger.warn(f'CHECK-FAIL: Missing target URL and/or user agents')
 
@@ -53,8 +55,8 @@ def reporter(reppath: Path, repdata: List[dict]):
                                 )
             writer.writeheader()
             for entry in repdata:
-                writer.writerow({'agent': str(entry.get('agent')),
-                                 'url': str(entry.get('url')),
+                writer.writerow({'agent': entry.get('agent'),
+                                 'url': entry.get('url'),
                                  'status code': entry.get('status code'),
                                  'request headers': entry.get('request headers'),
                                  'response headers': entry.get('response headers'),
