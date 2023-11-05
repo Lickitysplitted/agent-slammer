@@ -7,6 +7,7 @@ import uvloop
 from pathlib import Path
 from rich.progress import track
 from csv import DictWriter
+from typing import List
 
 __author__ = 'Lickitysplitted'
 __version__ = '0.0.2'
@@ -20,58 +21,54 @@ desktop = [{"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 # most common mobile user agents
 mobile = [{"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.3", "pct": 51.53}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.", "pct": 9.94}, {"ua": "Mozilla/5.0 (iPad; CPU OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.", "pct": 3.95}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0.1 Mobile/15E148 Safari/604.", "pct": 3.16}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.", "pct": 2.26}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.", "pct": 1.81}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.", "pct": 1.81}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Mobile Safari/537.3", "pct": 1.36}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.3", "pct": 1.36}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.", "pct": 1.36}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_7_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/287.0.575244645 Mobile/19H357 Safari/604.", "pct": 1.36}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.", "pct": 1.36}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.", "pct": 1.36}, {"ua": "Mozilla/5.0 (Linux; Android 11; moto e20 Build/RONS31.267-94-14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.3", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.6 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/116.0.5845.103 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_5_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.2 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/285.0.570543384 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/287.0.575244645 Mobile/15E148 Safari/604.", "pct": 0.9}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1", "pct": 0.79}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36", "pct": 0.56}, {"ua": "Mozilla/5.0 (Linux; Android 13; SAMSUNG SM-A546B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/278.0.557984068 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 13; SAMSUNG SM-G780F) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 13; SAMSUNG SM-A536B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 13; SAMSUNG SM-M135F) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.69 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 12; SAMSUNG SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/22.0 Chrome/111.0.5563.116 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/114.0.5735.99 Mobile/15E148 Safari/604.", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 10; SAMSUNG SM-A600FN) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/22.0 Chrome/111.0.5563.116 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 10.0.99; S109 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/95.0.4638.74 Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 13; 22101320G Build/TKQ1.221114.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/108.0.5359.128 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 13; 22011119UY) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.3", "pct": 0.45}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36", "pct": 0.34}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0.1 Mobile/15E148 Safari/604.1", "pct": 0.34}, {"ua": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36 Edg/118.0.2088.76", "pct": 0.11}, {"ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36", "pct": 0.11}, {"ua": "Mozilla/5.0 (Android 14; Mobile; rv:120.0) Gecko/120.0 Firefox/120.0", "pct": 0.11}, {"ua": "Mozilla/5.0 (Android 11; Mobile; rv:109.0) Gecko/118.0 Firefox/118.0", "pct": 0.11}, {"ua": "Mozilla/5.0 (Linux; Android 12; BRA-AL00 Build/HUAWEIBRA-AL00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/97.0.4692.98 Mobile Safari/537.36 T7/13.43 BDOS/1.0 (HarmonyOS 3.0.0) SP-engine/2.81.0 baiduboxapp/13.43.5.10 (Baidu; P1 12) NABar/1.0", "pct": 0.11}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/287.0.575244645 Mobile/15E148 Safari/604.1", "pct": 0.11}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/118.0.5993.92 Mobile/15E148 Safari/604.1", "pct": 0.11}, {"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1", "pct": 0.11}]
 
-async def request(target: str, agents: list[dict]) -> list[dict]:
+async def request(target: str, agents: List[dict]) -> List[dict]:
     if target and agents:
         async with aiohttp.ClientSession() as session:
             reqlog = []
             for agent in track(agents, description="Hacking..."):
                 agent = agent.get("ua")
                 async with session.get(target, headers={'user-agent': agent}) as req:
-                    reqdata = {
-                        'agent': agent,
-                        'url': target,
-                        'status code': str(req.status),
-                        'response headers': str(req.headers),
-                        'cookies': str(req.cookies),
-                        'response text': (await req.text())
-                        }
+                    reqdata = {'agent': agent,
+                               'url': target,
+                               'status code': str(req.status),
+                               'response headers': str(req.headers),
+                               'cookies': str(req.cookies),
+                               'response text': (await req.text())}
                     reqlog.append(reqdata)
         return reqdata
     else:
         logger.warn(f'CHECK-FAIL: Missing target URL and/or user agents')
 
-def reporter(reppath: Path, repdata: list[dict]):
+def reporter(reppath: Path, repdata: List[dict]):
     if reppath and repdata:
         with open(reppath.resolve(), 'a', encoding='utf-8') as repobj:
-            writer = DictWriter(repobj, [
-                'agent',
-                'url',
-                'status code',
-                'request headers',
-                'response headers',
-                'cookies',
-                'response text'
-                ]
-                )
+            writer = DictWriter(repobj,
+                                ['agent',
+                                 'url',
+                                 'status code',
+                                 'request headers',
+                                 'response headers',
+                                 'cookies',
+                                 'response text']
+                                )
             writer.writeheader()
             for entry in repdata:
-                writer.writerow({
-                    'agent': str(entry.get('agent')),
-                    'url': str(entry.get('url')),
-                    'status code': entry.get('status code'),
-                    'request headers': entry.get('request headers'),
-                    'response headers': entry.get('response headers'),
-                    'cookies': entry.get('cookies'),
-                    'response text': entry.get('response text')
-                    })
+                writer.writerow({'agent': str(entry.get('agent')),
+                                 'url': str(entry.get('url')),
+                                 'status code': entry.get('status code'),
+                                 'request headers': entry.get('request headers'),
+                                 'response headers': entry.get('response headers'),
+                                 'cookies': entry.get('cookies'),
+                                 'response text': entry.get('response text')})
     else:
         logger.warn(f'CHECK-FAIL: Missing report path and/or report data')
 
 @app.command()
-def slam(url: str = typer.Option(help='Target URL'),
-         report: Path = typer.Option(help='Report output path'),
-         verbose: int = typer.Option(2, '--verbose', '-v', count=True, max=4, help='Log verbosity level')
-         ):
+def slam(
+        url: str = typer.Option(help='Target URL'),
+        report: Path = typer.Option(help='Report output path'),
+        verbose: int = typer.Option(2, '--verbose', '-v', count=True, max=4, help='Log verbosity level')
+        ):
     if url and report:
         logging.basicConfig(level=(verbose * 10) - 40)
         agents = desktop + mobile
