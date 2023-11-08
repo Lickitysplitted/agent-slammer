@@ -9,7 +9,6 @@ from typing import List
 
 import aiohttp
 import typer
-import uvloop
 from rich.progress import track
 
 __author__ = "Lickitysplitted"
@@ -653,7 +652,7 @@ def slam(
         agents = desktop + mobile
         report = Path(report)
         reporter(
-            reppath=report, repdata=(uvloop.run(request(target=url, agents=agents)))
+            reppath=report, repdata=(asyncio.run(request(target=url, agents=agents)))
         )
     else:
         logger.warn("CHECK-FAIL: Missing target URL and/or report path")
