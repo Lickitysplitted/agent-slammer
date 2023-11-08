@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-# trunk-ignore(ruff/F401)
 import asyncio
 import logging
 from csv import DictWriter
@@ -12,7 +9,7 @@ import typer
 from rich.progress import track
 
 __author__ = "Lickitysplitted"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)
@@ -595,9 +592,9 @@ async def request(target: str, agents: List[dict]) -> List[dict]:
                     reqdata = {
                         "agent": agent,
                         "url": target,
-                        "status code": str(req.status),
-                        "response headers": str(req.headers),
-                        "cookies": str(req.cookies),
+                        "status code": req.status,
+                        "response headers": req.headers,
+                        "cookies": req.cookies,
                         "response text": (await req.text()),
                     }
                     reqlog.append(reqdata)
@@ -606,7 +603,7 @@ async def request(target: str, agents: List[dict]) -> List[dict]:
         logger.warn("CHECK-FAIL: Missing target URL and/or user agents")
 
 
-def reporter(reppath: Path, repdata: List[dict]):
+def reporter(reppath: Path, repdata: List[dict]) -> None:
     if reppath and repdata:
         with open(reppath.resolve(), "a", encoding="utf-8") as repobj:
             writer = DictWriter(
@@ -641,7 +638,6 @@ def reporter(reppath: Path, repdata: List[dict]):
 @app.command()
 def slam(
     url: str = typer.Option(help="Target URL"),
-    # trunk-ignore(ruff/B008)
     report: Path = typer.Option(help="Report output path"),
     verbose: int = typer.Option(
         2, "--verbose", "-v", count=True, max=4, help="Log verbosity level"
