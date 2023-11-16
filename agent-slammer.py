@@ -16,31 +16,35 @@ app = typer.Typer()
 logger = logging.getLogger(__name__)
 
 
-async def builder(target: str, agents: json) -> List:
-    #create task build loop
+async def tasker(target: str, agents: json) -> List[dict]:
+    if target and agents:
+        reqtasks = []
+        reqlog = []
+        for agent in track(agents, description="Building task list"):
+            task = asyncio.create_task(request(target=target, agent=agent["ua"]))
+            reqtasks.append(task)
+        for reqtask in track(reqtasks, description="Performing queries"):
+            reqlog.append(await reqtask)
+        return reqlog
     pass
 
-async def request(target: str, agents: json) -> List[dict]:
-    if target and agents:
+async def request(target: str, agent: str) -> dict:
+    if target and agent:
         log = logging.getLogger("charset_normalizer")
         log.setLevel(logging.WARNING)
         async with aiohttp.ClientSession() as session:
-            reqlog = []
-            for agent in track(agents, description="Hacking..."):
-                #agent = agent.get("ua")
-                async with session.get(target, headers={"user-agent": agent["ua"]}) as req:
-                    reqdata = {
-                        "agent": agent,
-                        "url": target,
-                        "status code": req.status,
-                        "response headers": req.headers,
-                        "cookies": req.cookies,
-                        "response text": (await req.text()),
-                    }
-                    reqlog.append(reqdata)
-        return reqlog
+            async with session.get(target, headers={"user-agent": agent}) as req:
+                reqdata = {
+                    "agent": agent,
+                    "url": target,
+                    "status code": req.status,
+                    "response headers": req.headers,
+                    "cookies": req.cookies,
+                    "response text": (await req.text()),
+                }
+        return reqdata
     else:
-        logger.warn("CHECK-FAIL: Missing target URL and/or user agents")
+        logger.warning("CHECK-FAIL: Missing target URL and/or user agents")
 
 
 def reporter(reppath: Path, repdata: List[dict]) -> None:
@@ -72,7 +76,7 @@ def reporter(reppath: Path, repdata: List[dict]) -> None:
                     }
                 )
     else:
-        logger.warn("CHECK-FAIL: Missing report path and/or report data")
+        logger.warning("CHECK-FAIL: Missing report path and/or report data")
 
 
 @app.command()
@@ -80,22 +84,23 @@ def slam(
     url: str = typer.Option(help="Target URL"),
     report: Path = typer.Option(help="Report output path"),
     agents: Path = typer.Option(
-        ".\user-agents.json",
+        default=Path("user-agents.json"),
         help="JSON file containing the user agent strings"
         ),
     verbose: int = typer.Option(
-        2, "--verbose", "-v", count=True, max=4, help="Log verbosity level"
+        2, "-v", count=True, max=4, help="Log verbosity level"
     ),
-):
+) -> None:
     if url and report:
         logging.basicConfig(level=(verbose * 10) - 40)
-        agents = json.load(Path.resolve(agents))
+        f = open(agents)
+        agents = json.load(f)
         report = Path(report)
         reporter(
-            reppath=report, repdata=(asyncio.run(request(target=url, agents=agents)))
+            reppath=report, repdata=(asyncio.run(tasker(target=url, agents=agents)))
         )
     else:
-        logger.warn("CHECK-FAIL: Missing target URL and/or report path")
+        logger.warning("CHECK-FAIL: Missing target URL and/or report path")
 
 
 if __name__ == "__main__":
