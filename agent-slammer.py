@@ -42,7 +42,7 @@ async def request(target: str, agent: str) -> dict:
                 }
         return reqdata
     else:
-        logger.warning("CHECK-FAIL: Missing target URL and/or user agents")
+        logger.critical("CHECK-FAIL: Missing target URL and/or user agents")
 
 
 def reporter(reppath: Path, repdata: List[dict]) -> None:
@@ -64,7 +64,7 @@ def reporter(reppath: Path, repdata: List[dict]) -> None:
             for entry in repdata:
                 writer.writerow(entry)
     else:
-        logger.warning("CHECK-FAIL: Missing report path and/or report data")
+        logger.critical("CHECK-FAIL: Missing report path and/or report data")
 
 
 @app.command()
@@ -88,7 +88,7 @@ def slam(
             reppath=report, repdata=(asyncio.run(tasker(target=url, agents=agents)))
         )
     else:
-        logger.warning("CHECK-FAIL: Missing target URL and/or report path")
+        logger.critical("CHECK-FAIL: Missing target URL and/or report path")
 
 
 if __name__ == "__main__":
