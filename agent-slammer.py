@@ -64,17 +64,7 @@ def reporter(reppath: Path, repdata: List[dict]) -> None:
             )
             writer.writeheader()
             for entry in repdata:
-                writer.writerow(
-                    {
-                        "agent": entry.get("agent"),
-                        "url": entry.get("url"),
-                        "status code": entry.get("status code"),
-                        "request headers": entry.get("request headers"),
-                        "response headers": entry.get("response headers"),
-                        "cookies": entry.get("cookies"),
-                        "response text": entry.get("response text"),
-                    }
-                )
+                writer.writerow(entry)
     else:
         logger.warning("CHECK-FAIL: Missing report path and/or report data")
 
