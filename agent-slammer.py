@@ -30,8 +30,6 @@ async def tasker(target: str, agents: json) -> List[dict]:
 
 async def request(target: str, agent: str) -> dict:
     if target and agent:
-        log = logging.getLogger("charset_normalizer")
-        log.setLevel(logging.WARNING)
         async with aiohttp.ClientSession() as session:
             async with session.get(target, headers={"user-agent": agent}) as req:
                 reqdata = {
@@ -78,11 +76,11 @@ def slam(
         help="JSON file containing the user agent strings"
         ),
     verbose: int = typer.Option(
-        2, "-v", count=True, max=4, help="Log verbosity level"
+        0, "-v", count=True, max=4, help="Log verbosity level"
     ),
 ) -> None:
     if url and report:
-        logging.basicConfig(level=(verbose * 10) - 40)
+        logging.basicConfig(level=(((verbose + 5) * 10) - (verbose * 20)))
         f = open(agents)
         agents = json.load(f)
         report = Path(report)
